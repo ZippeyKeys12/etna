@@ -58,6 +58,9 @@ def stacked_barchart_times(
         dft = dft.reset_index()
         dft = dft.groupby(['strategy']).sum(numeric_only=False)
         for strategy in strategies:
+            if dft.empty:
+                continue
+
             # Note: I think the new version of Pandas broke some of this code.
             # Use 1.5.3 for now and come back and fix.
             results.loc[strategy].loc[within] = dft.loc[strategy]['solved'] - (

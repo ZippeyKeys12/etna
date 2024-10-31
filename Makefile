@@ -64,3 +64,9 @@ collect5.2:
 analyze5.2:
 	python3 experiments/coq-experiments/5.2/Analysis.py --data=$(DATA)/5.2/fix-reverted --original=$(DATA)/5.1 --figures=$(FIGURES)/fig5
 
+collect-cn:
+	mkdir -p $(DATA)/cn
+	python3 experiments/cn-experiments/Collect.py --data=$(DATA)/cn
+
+analyze-cn:
+	python3 experiments/cn-experiments/Analysis.py --data=$(DATA)/cn --figures=$(FIGURES)/cn
