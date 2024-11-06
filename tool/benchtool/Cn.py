@@ -19,7 +19,7 @@ class Cn(BenchTool):
             Config(start="//",
                    end="//",
                    ext=".c",
-                   path="workloads/CN",
+                   path="workloads/Cn",
                    ignore="test",
                    strategies=STRATEGIES_DIR,
                    impl_path=IMPL_DIR,
