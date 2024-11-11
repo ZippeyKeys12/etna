@@ -225,11 +225,16 @@ function [rec] (BST) delKey(KEY key, BST root) {
           Node { data: res.data, smaller: smaller, larger: res.tree }
         }
       } else {
+        //! //
         if (key < data.key) {
           Node { data: data, smaller: delKey(key, smaller), larger: larger }
         } else {
           Node { data: data, smaller: smaller, larger: delKey(key, larger) }
         }
+        //!! delete_4_spec //
+        //! if (key < data.key) { delKey(key, smaller) } else { delKey(key, larger) } //
+        //!! delete_5_spec //
+        //! if (key > data.key) { Node { data: data, smaller: delKey(key, smaller), larger: larger } } else { Node { data: data, smaller: smaller, larger: delKey(key, larger) } } //
       }
     }
   }
