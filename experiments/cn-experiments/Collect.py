@@ -12,7 +12,7 @@ def collect(results: str):
     tool = Cn(results)
 
     for workload in tool.all_workloads():
-        if workload.name not in ['BST', 'DLL', 'ImperativeQueue', 'Runway']:
+        if workload.name not in ['BST', 'DLL', 'ImperativeQueue', 'Runway','SortedList']:
             continue
 
         for variant in tool.all_variants(workload):

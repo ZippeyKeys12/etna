@@ -65,8 +65,11 @@ class Cn(BenchTool):
                     stdout_data, stderr_data = process.communicate(
                         timeout=args.timeout)
                     end_time = time.perf_counter()
-                    res = stdout_data.splitlines()[-1]
-                    m = re.match(r'cases: (\d+), passed: (\d+), failed: (\d+), errored: (\d+)',res)
+                    try:
+                        res = stdout_data.splitlines()[-1]
+                        m = re.match(r'cases: (\d+), passed: (\d+), failed: (\d+), errored: (\d+)',res)
+                    except IndexError:
+                        m = None
                     if m is None or int(m.group(4)) > 0:
                         self._log(
                             f"Unexpected! Error Processing {args.strategy} Output:",
