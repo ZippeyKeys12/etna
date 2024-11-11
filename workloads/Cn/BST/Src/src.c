@@ -161,6 +161,7 @@ function [rec] (BST) insert(KEY key, VALUE value, BST tree) {
     Leaf {} => { Node { data: { key: key, value: value },
                         smaller: Leaf {}, larger: Leaf {} } }
     Node { data: data, smaller: smaller, larger: larger } => {
+      //! //
       if (data.key == key) {
         Node { data: { key: key, value: value },
                smaller: smaller, larger: larger }
@@ -173,6 +174,12 @@ function [rec] (BST) insert(KEY key, VALUE value, BST tree) {
                  smaller: insert(key,value,smaller), larger: larger }
         }
       }
+      //!! insert_1_spec //
+      //! Node { data: { key: key, value: value }, smaller: Leaf {}, larger: Leaf {} } //
+      //!! insert_2_spec //
+      //! if (data.key < key) { Node { data: data, smaller: smaller, larger: insert(key,value,larger) } } else { Node { data: { key: key, value: value }, smaller: smaller, larger: larger } } //
+      //!! insert_3_spec //
+      //! if (data.key == key) { Node { data: { key: key, value: data.value }, smaller: smaller, larger: larger } } else { if (data.key < key) { Node { data: data, smaller: smaller, larger: insert(key,value,larger) } } else { Node { data: data, smaller: insert(key,value,smaller), larger: larger } } } //
     }
   }
 }
@@ -426,40 +433,6 @@ ensures
   return parent;
 }
 
-/* Insert an element into a map. Overwrites previous if already present. */
-void setNodeKey(struct MapNode **root, KEY key, VALUE value)
-/*@
-requires
-  take root_ptr = Owned(root);
-  take tree = BST(root_ptr);
-ensures
-  take new_root = Owned(root);
-  take new_tree = BST(new_root);
-  new_tree == insert(key, value, tree);
-@*/
-{
-  struct MapNode *found = *root;
-  struct MapNode *parent = findParent(&found, key);
-
-
-  if (found) {
-    found->value = value;
-    return;
-  }
-
-  if (!parent) {
-    *root = newNode(key,value);
-    return;
-  }
-
-  struct MapNode *new_node = newNode(key,value);
-  if (parent->key < key) {
-    parent->larger = new_node;
-  } else {
-    parent->smaller = new_node;
-  }
-}
-
 
 void deleteTree(struct MapNode *root)
 /*@ 
@@ -473,6 +446,51 @@ void deleteTree(struct MapNode *root)
   deleteTree(root->smaller);
   deleteTree(root->larger);
   cn_free_sized(root, sizeof(struct MapNode));
+}
+
+
+/* Insert an element into a map. Overwrites previous if already present. */
+void setNodeKey(struct MapNode **root, KEY key, VALUE value)
+/*@
+requires
+  take root_ptr = Owned(root);
+  take tree = BST(root_ptr);
+ensures
+  take new_root = Owned(root);
+  take new_tree = BST(new_root);
+  new_tree == insert(key, value, tree);
+@*/
+{
+  //! //
+  //!! insert_1_impl //
+  //! (*root)->key = key; (*root)->value = value; deleteTree((*root)->smaller); deleteTree((*root)->larger); (*root)->smaller = 0; (*root)->larger = 0;  //
+
+  struct MapNode *found = *root;
+  struct MapNode *parent = findParent(&found, key);
+
+  if (found) {
+    //! //
+    found->value = value;
+    //!! insert_3_impl //
+    //! //
+    return;
+  }
+
+  if (!parent) {
+    *root = newNode(key,value);
+    return;
+  }
+
+  struct MapNode *new_node = newNode(key,value);
+  //! //
+  if (parent->key < key) {
+    parent->larger = new_node;
+  } else
+  //!! insert_2_impl //
+  //! //
+  {
+    parent->smaller = new_node;
+  }
 }
 
 
@@ -520,7 +538,6 @@ struct MapNode* deleteSmallest(struct MapNode **root)
   return cur;
 }
 
-
 void deleteKey(struct MapNode **root, KEY key)
 /*@
 requires
@@ -535,19 +552,28 @@ ensures
   struct MapNode *found = *root;
   struct MapNode *parent = findParent(&found, key);
 
-  if (!found) return;
+  if (!found) { return; }
   struct MapNode *remove = deleteSmallest(&found->larger);
   if (remove) {
     found->key = remove->key;
-    found->value = remove->value;    
+    found->value = remove->value;
   } else {
     remove = found;
-    //!//
-    if (parent) parent->smaller = found->smaller;
-    else
+    //! //
+    if (!parent) {
     //!! always_update_root_instead_of_parent //
-    //!//
+    //! if (1) { //
       *root = found->smaller;
+    //! //
+    } else if (key < parent->key) {
+    //!! always_assign_smaller //
+    //! } else if (1) { //
+      parent->smaller = found->smaller;
+    } else if (key > parent->key) {
+      parent->larger = found->smaller;
+    } else {
+      /* unreachable */
+    }
   }
   cn_free_sized(remove, sizeof(struct MapNode));
 }
