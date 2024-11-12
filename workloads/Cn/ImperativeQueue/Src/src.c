@@ -144,8 +144,8 @@ void push_queue(int x, struct queue* q)
   }
   else {
     struct queue_cell* oldback = q->back;
-    q->back->next = c;
     q->back = c;
+    oldback->next = c;
     /*@ apply push_lemma (q->front, oldback); @*/
     return;
   }

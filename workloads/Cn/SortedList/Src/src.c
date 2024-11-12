@@ -108,5 +108,4 @@ void insert(int x, struct List **xs)
     node->next = *xs;
     *xs = node;
   }
-
 }
