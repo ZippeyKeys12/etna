@@ -16,12 +16,11 @@ def analyze(results: str, images: str):
         times(
             strategies=[
                 'default',
-                # 'no_reorder',
-                # 'no_consistency',
+                'no_reorder',
+                'no_picks',
                 # 'no_flatten',
-                # 'no_lift_constraints',
-                # 'no_picks',
-                # 'no_reorder'
+                'no_consistency',
+                'no_lift_constraints'
             ],
             colors=['#000000', '#900D0D', '#DC5F00', '#D61C4E', '#6D0E56', '#243763'],
             limits=[0.1, 1, 10, 60],
