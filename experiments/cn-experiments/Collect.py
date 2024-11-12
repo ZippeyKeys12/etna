@@ -23,7 +23,6 @@ def collect(results: str):
         ]:
             continue
 
-
         for variant in tool.all_variants(workload):
             if variant.name == 'base':
                 # Don't run on base (non-buggy) implementation.
@@ -31,10 +30,14 @@ def collect(results: str):
 
             run_trial = None
 
-            for strategy in tool.all_strategies(workload):
-                if strategy.name not in ['default']:
-                    continue
-
+            for strategy in [
+                    'default',
+                    'no_reorder',
+                    'no_picks',
+                    'no_flatten',
+                    'no_consistency',
+                    'no_lift_constraints'
+            ]:
                 for property in tasks[workload.name][variant.name]:
                     trials = 10
 
@@ -46,7 +49,7 @@ def collect(results: str):
 
                     # Don't compile tasks that are already completed.
                     finished = set(os.listdir(results))
-                    file = f'{workload.name},{strategy.name},{variant.name},{property}'
+                    file = f'{workload.name},{strategy},{variant.name},{property}'
                     if f'{file}.json' in finished:
                         continue
 
@@ -54,7 +57,7 @@ def collect(results: str):
                         run_trial = tool.apply_variant(workload, variant)
 
                     cfg = TrialConfig(workload=workload,
-                                      strategy=strategy.name,
+                                      strategy=strategy,
                                       property=property,
                                       trials=trials,
                                       timeout=timeout,

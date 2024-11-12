@@ -8,10 +8,6 @@ import time
 from benchtool.BenchTool import BenchTool, Entry
 from benchtool.Types import Config, LogLevel, ReplaceLevel, TrialArgs
 
-IMPL_DIR = 'Src'
-STRATEGIES_DIR = 'Strategies'
-SPEC_PATH = 'Src/funcs.txt'
-
 
 class Cn(BenchTool):
     def __init__(self,  results: str, log_level: LogLevel = LogLevel.INFO, replace_level: ReplaceLevel = ReplaceLevel.REPLACE):
@@ -21,9 +17,9 @@ class Cn(BenchTool):
                    ext=".c",
                    path="workloads/Cn",
                    ignore="test",
-                   strategies=STRATEGIES_DIR,
-                   impl_path=IMPL_DIR,
-                   spec_path=SPEC_PATH),
+                   strategies='',
+                   impl_path='./',
+                   spec_path=''),
             results, log_level, replace_level)
 
     def all_properties(self, workload: Entry) -> list[str]:
@@ -37,7 +33,10 @@ class Cn(BenchTool):
 
     def _run_trial(self, workload_path: str, args: TrialArgs):
         with self._change_dir(workload_path):
-            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=60', '--exit-fast', 'Src/src.c', '--only', args.property]
+            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=60', '--exit-fast', 'src.c', '--only', args.property]
+            if args.strategy != "default":
+                cmd.extend(['--disable', args.strategy[3:]]) # cuts off "no_" from strategy name
+
             results = []
             self._log(
                 f"Running {args.workload},{args.strategy},{args.mutant},{args.property}", LogLevel.INFO)
@@ -68,7 +67,7 @@ class Cn(BenchTool):
                         m = re.match(r'cases: (\d+), passed: (\d+), failed: (\d+), errored: (\d+)',res)
                     except IndexError:
                         m = None
-                    if m is None or int(m.group(4)) > 0:
+                    if m is None:
                         self._log(
                             f"Unexpected! Error Processing {args.strategy} Output:",
                             LogLevel.ERROR)
