@@ -197,15 +197,16 @@ function [rec] (BST) setKey(KEY k, BST root, BST value) {
   }
 }
 
-function [rec] ({ NodeData data, BST tree }) delLeast(BST root) {
+function [rec] ({ boolean empty, NodeData data, BST tree }) delLeast(BST root) {
   match root {
-    Leaf {} => { { data: defaultNodeData(), tree: Leaf {} } }
+    Leaf {} => { { empty: true, data: defaultNodeData(), tree: Leaf {} } }
     Node { data: data, smaller: smaller, larger: larger } => {
       if (isLeaf(smaller)) {
-        { data: data, tree: larger }
+        { empty: false, data: data, tree: larger }
       } else {
          let res = delLeast(smaller);
-         { data: res.data,
+         { empty: false,
+           data: res.data,
            tree: Node { data: data, smaller: res.tree, larger: larger }
          }
       }
@@ -219,7 +220,10 @@ function [rec] (BST) delKey(KEY key, BST root) {
     Node { data: data, smaller: smaller, larger: larger } => {
       if (key == data.key) {
         let res = delLeast(larger);
-        if (isLeaf(res.tree)) {
+        //! //
+        if (res.empty) {
+        //!! delete_empty_vs_singleton //
+        //! if (isLeaf(res)) { //
           smaller
         } else {
           Node { data: res.data, smaller: smaller, larger: res.tree }
@@ -505,6 +509,7 @@ ensures
 /*@
 predicate (void) DeleteSmallest(pointer cur, NodeData data) {
   if (is_null(cur)) {
+    assert(data == defaultNodeData());
     return;
   } else {
     take node = Owned<struct MapNode>(cur);
@@ -537,11 +542,15 @@ struct MapNode* deleteSmallest(struct MapNode **root)
     cur = cur->smaller;
   }
 
-  if (parent) parent->smaller = cur->larger;
-  //!//
-  else *root = cur->larger;
+  if (parent) {
+    parent->smaller = cur->larger;
+  }
+  //! //
+  else {
+    *root = cur->larger;
+  }
   //!! forget_to_update_root //
-  //!//
+  //! //
 
   return cur;
 }
