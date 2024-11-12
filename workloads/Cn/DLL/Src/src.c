@@ -13,16 +13,6 @@ datatype List {
   Nil {},
   Cons {i32 Head, datatype List Tail}
 }
-
-predicate (datatype List) SLList_At(pointer p) {
-  if (is_null(p)) {
-    return Nil{};
-  } else {
-    take H = Owned<struct sllist>(p);
-    take T = SLList_At(H.tail);
-    return (Cons { Head: H.head, Tail: T });
-  }
-}
 @*/
 /*@
 function (i32) Hd (datatype List L) {
@@ -47,66 +37,13 @@ function (datatype List) Tl (datatype List L) {
   }
 }
 @*/
-struct sllist* slnil()
-  /*@ ensures take Ret = SLList_At(return);
-              Ret == Nil{};
-   @*/
-{
-  return 0;
-}
-struct sllist* slcons(int h, struct sllist* t)
-  /*@ requires take T = SLList_At(t);
-      ensures take Ret = SLList_At(return);
-              Ret == Cons{ Head: h, Tail: T};
-   @*/
-{
-  struct sllist* p = cn_malloc(sizeof(struct sllist));
-  p->head = h;
-  p->tail = t;
-  return p;
-}
-/*@
-function [rec] (datatype List) Append(datatype List L1, datatype List L2) {
-  match L1 {
-    Nil {} => {
-      L2
-    }
-    Cons {Head : H, Tail : T}  => {
-      Cons {Head: H, Tail: Append(T, L2)}
-    }
-  }
-}
-@*/
-/*@
-function [rec] (datatype List) Snoc(datatype List Xs, i32 Y) {
-  match Xs {
-    Nil {} => {
-      Cons {Head: Y, Tail: Nil{}}
-    }
-    Cons {Head: X, Tail: Zs}  => {
-      Cons{Head: X, Tail: Snoc (Zs, Y)}
-    }
-  }
-}
-@*/
 
-/*@
-function [rec] (datatype List) RevList(datatype List L) {
-  match L {
-    Nil {} => {
-      Nil {}
-    }
-    Cons {Head : H, Tail : T}  => {
-      Snoc (RevList(T), H)
-    }
-  }
-}
-@*/
 struct dllist {
   int data;
   struct dllist* prev;
   struct dllist* next;
 };
+
 /*@
 datatype Dll {
     Empty_Dll    {},
@@ -194,7 +131,7 @@ struct dllist* singleton(int element)
   return n;
 }
 // Adds after the given node and returns a pointer to the new node
-struct dllist* add(int element, struct dllist* n)
+struct dllist* dll_insert_at(int element, struct dllist* n)
   /*@ requires take Before = Dll_at(n);
       ensures  take After = Dll_at(return);
                is_null(n) ?
@@ -211,8 +148,7 @@ struct dllist* add(int element, struct dllist* n)
 {
   struct dllist* new_dllist = cn_malloc(sizeof(struct dllist));
   new_dllist->data = element;
-  new_dllist->prev = 0;
-  new_dllist->next = 0;
+
   if (n == 0) //empty list case
   {
     new_dllist->prev = 0;
@@ -221,14 +157,14 @@ struct dllist* add(int element, struct dllist* n)
   }
   else {
     /*@ split_case(is_null(n->prev)); @*/
-    //! //
     new_dllist->next = n->next;
-    //!! null_next //
-    //! new_dllist->next = 0; //
     new_dllist->prev = n;
     if (n->next != 0) {
       /*@ split_case(is_null(n->next->next)); @*/
+      //! //
       n->next->prev = new_dllist;
+      //!! forget_to_set_next_prev //
+      //! //
     }
     n->next = new_dllist;
     return new_dllist;
@@ -242,7 +178,7 @@ struct dllist_and_int {
 
 // Remove the given node from the list and returns another pointer 
 // to somewhere in the list, or a null pointer if the list is empty
-struct dllist_and_int* list_remove(struct dllist* n)
+struct dllist_and_int* dll_remove(struct dllist* n)
   /*@ requires !is_null(n);
                take Before = Dll_at(n);
                let Del = Node(Before);
@@ -277,3 +213,67 @@ struct dllist_and_int* list_remove(struct dllist* n)
   cn_free_sized(n, sizeof(struct dllist));
   return pair;
 }
+
+// /*@
+// function [rec] (datatype List) SLAppend(datatype List L1, datatype List L2) {
+//   match L1 {
+//     Nil {} => {
+//       L2
+//     }
+//     Cons {Head : H, Tail : T}  => {
+//       Cons {Head: H, Tail: SLAppend(T, L2)}
+//     }
+//   }
+// }
+
+// function [rec] (datatype Dll) DLAppend(struct dllist curr, datatype Dll xs, datatype Dll ys) {
+//   match xs {
+//     Empty_Dll {} => {
+//       ys
+//     }
+//     Nonempty_Dll { left: left1, curr: _, right: right1 } => {
+//       match ys {
+//         Empty_Dll {} => {
+//           xs
+//         }
+//         Nonempty_Dll { left: left2, curr: curr2, right: right2 } => {
+//           Nonempty_Dll {
+//             left: left1,
+//             curr: curr,
+//             right: SLAppend(
+//               right1,
+//               SLAppend(
+//                 left2,
+//                 Cons { Head: curr2.data, Tail: right2 }
+//               )
+//             )
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+// @*/
+
+// struct dllist* dll_append(struct dllist* xs, struct dllist* ys)
+// /*@
+//   requires
+//     take Xs = Dll_at(xs);
+//     take Ys = Dll_at(ys);
+//   ensures
+//     take Zs = Dll_at(return);
+//     Zs == DLAppend(Node(Zs), Xs, Ys);
+// @*/
+// {
+//   if (!xs) {
+//     return ys;
+//   }
+//   else {
+//     struct dllist* tmp = dll_append(xs->next, ys);
+//     xs->next = tmp;
+//     if (tmp) {
+//       tmp->prev = xs;
+//     }
+//     return xs;
+//   }
+// }
