@@ -33,13 +33,11 @@ class Cn(BenchTool):
             return contents
 
     def _build(self, workload_path: str):
-        with self._change_dir(workload_path):
-            self._shell_command(["mkdir", "-p", "test"])
-            self._shell_command(["mkdir", "-p", "test"])
+        pass
 
     def _run_trial(self, workload_path: str, args: TrialArgs):
         with self._change_dir(workload_path):
-            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=60', '--exit-fast', 'Src/src.c']
+            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=60', '--exit-fast', 'Src/src.c', '--only', args.property]
             results = []
             self._log(
                 f"Running {args.workload},{args.strategy},{args.mutant},{args.property}", LogLevel.INFO)
