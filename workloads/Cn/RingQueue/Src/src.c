@@ -107,7 +107,10 @@ predicate state QueueAbs(pointer p)
   take buf = each (i32 i; 0i32 <= i && i < q.size) { Owned<int>(q.buf + i) };
   assert (queue_wf (q.inp, q.outp, q.size));
   let content = seq_of_buf(buf, q.inp, q.outp, q.size);
+  //! //
   return {content: content, size: q.size - 1i32};
+  //!! empty_vs_full //
+  //! return {content: content, size: q.size}; //
 }
 
 @*/
@@ -143,10 +146,7 @@ struct queue* new(int n)
                 queue_out.content == Seq_Nil {};
     @*/
 {
-  //! //
   int bufsize = n + 1;
-  //!! empty_vs_full //
-  //! int bufsize = n; //
   int* buff = malloc_buf(bufsize);
   struct queue q = {0, 0, bufsize, buff};
   struct queue* qptr = malloc_queue();
