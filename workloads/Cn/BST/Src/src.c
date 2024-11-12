@@ -434,7 +434,10 @@ ensures
     parent = cur;
     cur = k < key? cur->larger : cur->smaller;
   }
+  //! //
   *node = cur;
+  //!! forget_last_node_cur //
+  //! //
   return parent;
 }
 
@@ -447,7 +450,7 @@ void deleteTree(struct MapNode *root)
      true;
 @*/
 {
-  if (!root) return;
+  if (!root) { return; }
   deleteTree(root->smaller);
   deleteTree(root->larger);
   cn_free_sized(root, sizeof(struct MapNode));
@@ -468,7 +471,7 @@ ensures
 {
   //! //
   //!! insert_1_impl //
-  //! (*root)->key = key; (*root)->value = value; deleteTree((*root)->smaller); deleteTree((*root)->larger); (*root)->smaller = 0; (*root)->larger = 0;  //
+  //! (*root)->key = key; (*root)->value = value; deleteTree((*root)->smaller); deleteTree((*root)->larger); (*root)->smaller = 0; (*root)->larger = 0; return; //
 
   struct MapNode *found = *root;
   struct MapNode *parent = findParent(&found, key);
@@ -522,7 +525,7 @@ struct MapNode* deleteSmallest(struct MapNode **root)
     take new_tree = BST(new_root);
     let res = delLeast(tree);
     new_tree == res.tree;
-    take unsued = DeleteSmallest(return, res.data);    
+    take unused = DeleteSmallest(return, res.data);    
 @*/
 {
   struct MapNode *cur = *root;
