@@ -33,7 +33,7 @@ class Cn(BenchTool):
 
     def _run_trial(self, workload_path: str, args: TrialArgs):
         with self._change_dir(workload_path):
-            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=60', '--exit-fast', 'src.c', '--only', args.property]
+            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=100', '--exit-fast', 'src.c', '--only', args.property]
             if args.strategy.startswith('no_'):
                 cmd.extend(['--disable', args.strategy[3:]]) # cuts off "no_" from strategy name
             if args.strategy == 'nothing':
