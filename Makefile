@@ -69,4 +69,5 @@ collect-cn:
 	python3 experiments/cn-experiments/Collect.py --data=$(DATA)/cn
 
 analyze-cn:
+	mkdir -p $(FIGURES)/cn
 	python3 experiments/cn-experiments/Analysis.py --data=$(DATA)/cn --figures=$(FIGURES)/cn

@@ -17,7 +17,7 @@ def analyze(results: str, images: str):
             strategies=[
                 'default',
                 'no_reorder',
-                'no_picks',
+                # 'no_picks',
                 # 'no_flatten',
                 'no_consistency',
                 'no_lift_constraints',

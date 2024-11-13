@@ -33,14 +33,14 @@ def collect(results: str):
             for strategy in [
                     'default',
                     'no_reorder',
-                    'no_picks',
+                    # 'no_picks',
                     # 'no_flatten',
                     'no_consistency',
                     'no_lift_constraints',
                     'nothing'
             ]:
                 for property in tasks[workload.name][variant.name]:
-                    trials = 10
+                    trials = 25
 
                     # Also, stop trials as soon as fail to find bug.
                     # (via short_circuit flag below)

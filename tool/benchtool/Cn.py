@@ -33,7 +33,7 @@ class Cn(BenchTool):
 
     def _run_trial(self, workload_path: str, args: TrialArgs):
         with self._change_dir(workload_path):
-            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=100', '--exit-fast', 'src.c', '--only', args.property]
+            cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=100', '--max-generator-size=25', '--exit-fast', 'src.c', '--only', args.property]
             if args.strategy.startswith('no_'):
                 cmd.extend(['--disable', args.strategy[3:]]) # cuts off "no_" from strategy name
             if args.strategy == 'nothing':
@@ -43,6 +43,7 @@ class Cn(BenchTool):
             self._log(
                 f"Running {args.workload},{args.strategy},{args.mutant},{args.property}", LogLevel.INFO)
             for _ in range(args.trials):
+                time.sleep(1.1)
                 try:
                     trial_result = {
                         "workload": args.workload,
@@ -136,6 +137,8 @@ class Cn(BenchTool):
             except TypeError as e:
                 print(results)
                 raise e
+            
+            subprocess.call(['rm', '-rf', 'test/*'])
 
     def _preprocess(self, workload: Entry) -> None:
         pass
