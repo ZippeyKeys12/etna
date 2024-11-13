@@ -157,9 +157,17 @@ struct dllist* dll_insert_at(int element, struct dllist* n)
   }
   else {
     /*@ split_case(is_null(n->prev)); @*/
+    //! //
     new_dllist->next = n->next;
     new_dllist->prev = n;
+    //!! next_is_self //
+    //! new_dllist->next = new_dllist; new_dllist->prev = new_dllist; //
+
+    //! //
     if (n->next != 0) {
+    //!! forget_to_check_for_next_null //
+    //! if (1) { //
+
       /*@ split_case(is_null(n->next->next)); @*/
       //! //
       n->next->prev = new_dllist;
@@ -197,15 +205,30 @@ struct dllist_and_int* dll_remove(struct dllist* n)
   @*/
 {
   struct dllist* temp = 0;
+  //! //
   if (n->prev != 0) {
+  //!! forget_to_check_prev_null //
+  //! if (1) { //
     /*@ split_case(is_null(n->prev->prev)); @*/
+
+    //! //
     n->prev->next = n->next;
+    //!! confuse_prev_next_with_prev //
+    //! n->prev = n->next; //
+
+    //! //
     temp = n->prev;
+    //!! forget_to_set_temp //
+    //! //
   }
   if (n->next != 0) {
     /*@ split_case(is_null(n->next->next)); @*/
     n->next->prev = n->prev;
+
+    //! //
     temp = n->next;
+    //!! confuse_next_and_prev //
+    //! temp = n->prev; //
   }
   struct dllist_and_int* pair = cn_malloc(sizeof(struct dllist_and_int));
   pair->dllist = temp;

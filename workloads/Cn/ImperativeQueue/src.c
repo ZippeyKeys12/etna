@@ -137,15 +137,26 @@ void push_queue(int x, struct queue* q)
   struct queue_cell* c = cn_malloc(sizeof(struct queue_cell));
   c->first = x;
   c->next = 0;
+  
+  //! //
   if (q->back == 0) {
+  //!! forget_about_empty //
+  //! if (0) { //
     q->front = c;
     q->back = c;
     return;
   }
   else {
     struct queue_cell* oldback = q->back;
+    //! //
     q->back = c;
+    //!! forget_to_update_back //
+    //! //
+
+    //! //
     oldback->next = c;
+    //!! forget_to_update_oldback //
+    //! //
     /*@ apply push_lemma (q->front, oldback); @*/
     return;
   }
@@ -174,10 +185,19 @@ int pop_queue(struct queue* q)
 {
   /*@ split_case is_null(q->front); @*/
   struct queue_cell* h = q->front;
+
+  //! //
   if (h == q->back) {
+  //!! forget_about_singletons //
+  //! if (0) { //
+
     /*@ assert ((alloc_id) h == (alloc_id) (q->back)); @*/
-    int x = h->first;
+  
+    //! //
+    int x = h->first;  
     cn_free_sized(h, sizeof(struct queue_cell));
+    //!! read_after_free //
+    //! cn_free_sized(h, sizeof(struct queue_cell)); int x = h->first; //
     q->front = 0;
     q->back = 0;
     /*@ unfold Snoc(Nil{}, x); @*/
