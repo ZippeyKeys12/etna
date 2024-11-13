@@ -31,10 +31,9 @@ tasks: dict[str, dict[str, list[str]]] = {
         'forget_change_front': ['pop_queue'],
         'forget_about_singletons': ['pop_queue'],
         'read_after_free': ['pop_queue'],
-        'forget_about_empty': ['push_queue' ],
-        'forget_to_update_oldback': ['push_queue' ],
-        'forget_to_update_back': ['push_queue' ]
-
+        'forget_about_empty': ['push_queue'],
+        'forget_to_update_oldback': ['push_queue'],
+        'forget_to_update_back': ['push_queue']
     },
     'Runway': {
         'valid_a': ['tick'],

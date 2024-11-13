@@ -66,10 +66,10 @@ class Cn(BenchTool):
                     end_time = time.perf_counter()
                     try:
                         res = stdout_data.splitlines()[-1]
-                        m = re.match(r'cases: (\d+), passed: (\d+), failed: (\d+), errored: (\d+)',res)
+                        m1 = re.match(r'cases: \d+, passed: \d+, failed: (?P<failed>\d+), errored: \d+', res)
                     except IndexError:
-                        m = None
-                    if m is None:
+                        m1 = None
+                    if m1 is None:
                         self._log(
                             f"Unexpected! Error Processing {args.strategy} Output:",
                             LogLevel.ERROR)
@@ -80,22 +80,39 @@ class Cn(BenchTool):
                         trial_result["passed"] = 0
                         trial_result["time"] = -1
                     else:
+                        m2s = re.findall(r'Testing \S+:( (?P<passes>\d+) runs)?(; (?P<discards>\d+) discarded)?(\r|\n)(?!T)', stdout_data)
+
+                        passed = 0
+                        discards = 0
+                        for m2 in m2s:
+                            passed += int(m2[1] or '0')
+                            discards += int(m2[3] or '0')
+
                         self._log(f"{args.strategy} Result: {res}", LogLevel.INFO)
-                        trial_result["foundbug"] = int(m.group(3)) > 0
-                        trial_result["discards"] = 0
-                        trial_result["passed"] = int(m.group(2))
+                        trial_result["foundbug"] = int(m1.group('failed')) > 0
+                        trial_result["discards"] = discards
+                        trial_result["passed"] = passed
                         trial_result["time"] = end_time - begin_time
 
                 except subprocess.TimeoutExpired as e:
                     print(f"Process Timed Out {process.pid}")
-                    os.system(f"pkill cn")
+                    process.kill()
+                    os.system("pkill tests.out")
+
+                    m2s = re.findall(r'Testing \S+:( (?P<passes>\d+) runs)?(; (?P<discards>\d+) discarded)?((\r|\n)(?!T)|$)', e.stdout.decode("utf-8"))
+
+                    passed = 0
+                    discards = 0
+                    for m2 in m2s:
+                        passed += int(m2[1] or '0')
+                        discards += int(m2[3] or '0')
+
                     trial_result["foundbug"] = False
-                    trial_result["discards"] = 0
-                    trial_result["passed"] = 0
+                    trial_result["discards"] = discards
+                    trial_result["passed"] = passed
                     trial_result["time"] = args.timeout
                     self._log(
                         f"{args.strategy} Result: Timeout", LogLevel.INFO)
-                    process.kill()
 
                 except subprocess.CalledProcessError as e:
                     self._log(f"Error Running {args.strategy}:", LogLevel.ERROR)
