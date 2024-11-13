@@ -34,8 +34,10 @@ class Cn(BenchTool):
     def _run_trial(self, workload_path: str, args: TrialArgs):
         with self._change_dir(workload_path):
             cmd = ['cn', 'test', '--output-dir=test/', '--until-timeout=60', '--exit-fast', 'src.c', '--only', args.property]
-            if args.strategy != "default":
+            if args.strategy.startswith('no_'):
                 cmd.extend(['--disable', args.strategy[3:]]) # cuts off "no_" from strategy name
+            if args.strategy == 'nothing':
+                cmd.extend(['--disable', 'reorder,picks,consistency,lift_constraints'])
 
             results = []
             self._log(
@@ -93,6 +95,7 @@ class Cn(BenchTool):
                     trial_result["time"] = args.timeout
                     self._log(
                         f"{args.strategy} Result: Timeout", LogLevel.INFO)
+                    process.kill()
 
                 except subprocess.CalledProcessError as e:
                     self._log(f"Error Running {args.strategy}:", LogLevel.ERROR)

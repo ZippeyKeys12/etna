@@ -20,9 +20,10 @@ def analyze(results: str, images: str):
                 'no_picks',
                 # 'no_flatten',
                 'no_consistency',
-                'no_lift_constraints'
+                'no_lift_constraints',
+                'nothing'
             ],
-            colors=['#000000', '#900D0D', '#DC5F00', '#D61C4E', '#6D0E56', '#243763'],
+            colors=['#000000', '#900D0D', '#DC5F00', '#6D0E56', '#243763', '#D61C4E'],
             limits=[0.1, 1, 10, 60],
             limit_type='time',
             image_path=images,

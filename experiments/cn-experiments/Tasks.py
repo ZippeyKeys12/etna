@@ -3,6 +3,7 @@ tasks: dict[str, dict[str, list[str]]] = {
         'insert_1_spec': ['setNodeKey'],
         'insert_2_spec': ['setNodeKey'],
         'insert_3_spec': ['setNodeKey'],
+        'delete_empty_vs_singleton': ['deleteKey'],
         'delete_4_spec': ['deleteKey'],
         'delete_5_spec': ['deleteKey'],
         'forget_last_node_cur': [

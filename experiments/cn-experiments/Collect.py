@@ -34,9 +34,10 @@ def collect(results: str):
                     'default',
                     'no_reorder',
                     'no_picks',
-                    'no_flatten',
+                    # 'no_flatten',
                     'no_consistency',
-                    'no_lift_constraints'
+                    'no_lift_constraints',
+                    'nothing'
             ]:
                 for property in tasks[workload.name][variant.name]:
                     trials = 10

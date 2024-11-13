@@ -223,7 +223,7 @@ function [rec] (BST) delKey(KEY key, BST root) {
         //! //
         if (res.empty) {
         //!! delete_empty_vs_singleton //
-        //! if (isLeaf(res)) { //
+        //! if (isLeaf(res.tree)) { //
           smaller
         } else {
           Node { data: res.data, smaller: smaller, larger: res.tree }
